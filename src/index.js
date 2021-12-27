@@ -7,6 +7,7 @@ import {
   doc,
   getDocs,
   getFirestore,
+  onSnapshot,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -27,16 +28,27 @@ const db = getFirestore();
 const colRef = collection(db, "books");
 
 // get collection Data
-const data = async () => {
+
+// const data = async () => {
+//   let books = [];
+//   const doc = await getDocs(colRef);
+//   doc.docs.map((item) => {
+//     books.push({ ...item.data(), id: item.id });
+//   });
+//   console.log(books, "books@@@");
+// };
+// data();
+
+
+// on snap shot!@
+onSnapshot(colRef,(snapshot)=>{
   let books = [];
-  const doc = await getDocs(colRef);
-  doc.docs.map((item) => {
+  console.log(snapshot.docChanges(),"##")
+  snapshot.docs.map((item) => {
     books.push({ ...item.data(), id: item.id });
   });
   console.log(books, "books@@@");
-};
-data();
-
+})
 
 // html add / delete form query
 const addForm = document.querySelector(".add");
