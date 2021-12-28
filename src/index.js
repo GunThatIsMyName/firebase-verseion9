@@ -12,6 +12,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 
@@ -50,6 +51,7 @@ const orderQ = query(colRef,orderBy("createdAt","desc"));
 
 const addForm = document.querySelector(".add");
 const deleteForm = document.querySelector(".delete");
+const editForm = document.querySelector(".edit");
 const box = document.querySelector(".box");
 // on snap shot!@
 
@@ -107,3 +109,17 @@ const singleData =async()=>{
 } 
 
 singleData();
+
+
+// edit 
+
+editForm.addEventListener("submit",async (e)=>{
+  e.preventDefault();
+
+  const docRef = doc(db,"books",editForm.id.value);
+
+  await updateDoc(docRef,{
+    title:"You are Awesome!"
+  })
+  editForm.reset();
+})
