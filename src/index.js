@@ -5,6 +5,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   getDocs,
   getFirestore,
   onSnapshot,
@@ -95,3 +96,14 @@ deleteForm.addEventListener("submit", async (e) => {
   await deleteDoc(docRef);
   deleteForm.reset();
 });
+
+
+// get single item 
+const singleRef = doc(colRef,"nA62IVeQ0mp0rRGmWqts");
+
+const singleData =async()=>{
+  const data = await getDoc(singleRef);
+  console.log(data.data(),"###")
+} 
+
+singleData();
