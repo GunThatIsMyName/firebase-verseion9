@@ -8,6 +8,8 @@ import {
   getDocs,
   getFirestore,
   onSnapshot,
+  query,
+  where,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -27,6 +29,9 @@ const db = getFirestore();
 // collection ref
 const colRef = collection(db, "books");
 
+// query 
+const q = query(colRef,where("author","==","minji"));
+
 // get collection Data
 
 // const data = async () => {
@@ -41,7 +46,7 @@ const colRef = collection(db, "books");
 
 
 // on snap shot!@
-onSnapshot(colRef,(snapshot)=>{
+onSnapshot(q,(snapshot)=>{
   let books = [];
   console.log(snapshot.docChanges(),"##")
   snapshot.docs.map((item) => {
@@ -58,7 +63,7 @@ addForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   await addDoc(colRef, {
     title: addForm.title.value,
-    authour: addForm.author.value,
+    author: addForm.author.value,
   });
   addForm.reset();
 });
