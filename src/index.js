@@ -8,7 +8,9 @@ import {
   getDocs,
   getFirestore,
   onSnapshot,
+  orderBy,
   query,
+  serverTimestamp,
   where,
 } from "firebase/firestore";
 
@@ -31,6 +33,7 @@ const colRef = collection(db, "books");
 
 // query 
 const q = query(colRef,where("author","==","minji"));
+const orderQ = query(colRef,orderBy("createdAt","desc"));
 
 // get collection Data
 
@@ -44,26 +47,40 @@ const q = query(colRef,where("author","==","minji"));
 // };
 // data();
 
-
+const addForm = document.querySelector(".add");
+const deleteForm = document.querySelector(".delete");
+const box = document.querySelector(".box");
 // on snap shot!@
-onSnapshot(q,(snapshot)=>{
+
+
+onSnapshot(orderQ,(snapshot)=>{
   let books = [];
   console.log(snapshot.docChanges(),"##")
   snapshot.docs.map((item) => {
     books.push({ ...item.data(), id: item.id });
   });
   console.log(books, "books@@@");
+
+  box.innerHTML=books.map(item=>{
+    return `
+      <div>
+        <h5>Title : ${item.title}</h5>
+        <h6>ID : ${item.id}</h6>
+        <p>${item.createdAt.toDate()}</p>
+      </div>
+    `;
+  }).join("");
+
 })
 
 // html add / delete form query
-const addForm = document.querySelector(".add");
-const deleteForm = document.querySelector(".delete");
 
 addForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   await addDoc(colRef, {
     title: addForm.title.value,
     author: addForm.author.value,
+    createdAt:serverTimestamp(),
   });
   addForm.reset();
 });
