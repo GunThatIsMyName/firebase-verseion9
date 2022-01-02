@@ -15,6 +15,8 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import { createUserWithEmailAndPassword, getAuth} from "firebase/auth";
+import { async } from "@firebase/util";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB2qgRYtp7RhPX24cPp4mH4LarOGm_2J2k",
@@ -29,6 +31,7 @@ initializeApp(firebaseConfig);
 
 // init service
 const db = getFirestore();
+const auth = getAuth();
 
 // collection ref
 const colRef = collection(db, "books");
@@ -53,6 +56,7 @@ const addForm = document.querySelector(".add");
 const deleteForm = document.querySelector(".delete");
 const editForm = document.querySelector(".edit");
 const box = document.querySelector(".box");
+const loginForm = document.querySelector(".signup");
 // on snap shot!@
 
 
@@ -62,7 +66,6 @@ onSnapshot(orderQ,(snapshot)=>{
   snapshot.docs.map((item) => {
     books.push({ ...item.data(), id: item.id });
   });
-  console.log(books, "books@@@");
 
   box.innerHTML=books.map(item=>{
     return `
@@ -105,7 +108,6 @@ const singleRef = doc(colRef,"nA62IVeQ0mp0rRGmWqts");
 
 const singleData =async()=>{
   const data = await getDoc(singleRef);
-  console.log(data.data(),"###")
 } 
 
 singleData();
@@ -123,3 +125,18 @@ editForm.addEventListener("submit",async (e)=>{
   })
   editForm.reset();
 })
+
+
+// getAuth
+loginForm.addEventListener("submit",async(e)=>{
+    e.preventDefault();
+
+    const email = loginForm.email.value;
+    const password = loginForm.password.value;
+
+    const pureLogin = await createUserWithEmailAndPassword(auth,email,password);
+    console.log(pureLogin,"login");
+
+})
+
+
