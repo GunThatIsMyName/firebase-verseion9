@@ -15,7 +15,16 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut} from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  signInWithRedirect,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB2qgRYtp7RhPX24cPp4mH4LarOGm_2J2k",
@@ -35,9 +44,9 @@ const auth = getAuth();
 // collection ref
 const colRef = collection(db, "books");
 
-// query 
-const q = query(colRef,where("author","==","minji"));
-const orderQ = query(colRef,orderBy("createdAt","desc"));
+// query
+const q = query(colRef, where("author", "==", "minji"));
+const orderQ = query(colRef, orderBy("createdAt", "desc"));
 
 // get collection Data
 
@@ -59,25 +68,25 @@ const signForm = document.querySelector(".signup");
 const loginForm = document.querySelector(".login");
 // on snap shot!@
 
-
-onSnapshot(orderQ,(snapshot)=>{
+onSnapshot(orderQ, (snapshot) => {
   let books = [];
-  console.log(snapshot.docChanges(),"##")
+  console.log(snapshot.docChanges(), "##");
   snapshot.docs.map((item) => {
     books.push({ ...item.data(), id: item.id });
   });
 
-  box.innerHTML=books.map(item=>{
-    return `
+  box.innerHTML = books
+    .map((item) => {
+      return `
       <div>
         <h5>Title : ${item.title}</h5>
         <h6>ID : ${item.id}</h6>
         <p>${item.createdAt.toDate()}</p>
       </div>
     `;
-  }).join("");
-
-})
+    })
+    .join("");
+});
 
 // html add / delete form query
 
@@ -86,7 +95,7 @@ addForm.addEventListener("submit", async (e) => {
   await addDoc(colRef, {
     title: addForm.title.value,
     author: addForm.author.value,
-    createdAt:serverTimestamp(),
+    createdAt: serverTimestamp(),
   });
   addForm.reset();
 });
@@ -94,7 +103,7 @@ addForm.addEventListener("submit", async (e) => {
 deleteForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // delete 하려는 item 을 doc() 으로 ref 잡고 
+  // delete 하려는 item 을 doc() 으로 ref 잡고
   const docRef = doc(db, "books", deleteForm.id.value);
 
   // deleteDoc () 이용해서 삭제
@@ -102,60 +111,76 @@ deleteForm.addEventListener("submit", async (e) => {
   deleteForm.reset();
 });
 
+// get single item
+const singleRef = doc(colRef, "nA62IVeQ0mp0rRGmWqts");
 
-// get single item 
-const singleRef = doc(colRef,"nA62IVeQ0mp0rRGmWqts");
-
-const singleData =async()=>{
+const singleData = async () => {
   const data = await getDoc(singleRef);
-} 
+};
 
 singleData();
 
+// edit
 
-// edit 
-
-editForm.addEventListener("submit",async (e)=>{
+editForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const docRef = doc(db,"books",editForm.id.value);
+  const docRef = doc(db, "books", editForm.id.value);
 
-  await updateDoc(docRef,{
-    title:"You are Awesome!"
-  })
+  await updateDoc(docRef, {
+    title: "You are Awesome!",
+  });
   editForm.reset();
-})
-
-
-// getAuth
-signForm.addEventListener("submit",async(e)=>{
-    e.preventDefault();
-
-    const email = signForm.email.value;
-    const password = signForm.password.value;
-
-    const pureLogin = await createUserWithEmailAndPassword(auth,email,password);
-    console.log(pureLogin,"login");
 });
 
-loginForm.addEventListener("submit",async(e)=>{
+// getAuth
+signForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const email = signForm.email.value;
+  const password = signForm.password.value;
+
+  const pureLogin = await createUserWithEmailAndPassword(auth, email, password);
+  console.log(pureLogin, "login");
+});
+
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const email = loginForm.email.value;
   const password = loginForm.password.value;
 
-  try{
-    const user = await signInWithEmailAndPassword(auth,email,password);
-    console.log(user.user,"??suer ")
-  }catch(error){
-    console.log(error,"login fail")
+  try {
+    const user = await signInWithEmailAndPassword(auth, email, password);
+    console.log(user.user, "??suer ");
+  } catch (error) {
+    console.log(error, "login fail");
   }
-})
-
+});
 
 const logoutBtn = document.querySelector(".logout");
 
-logoutBtn.addEventListener("click",async()=>{
-    await signOut(auth);
-    console.log("??")
-})
+logoutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+  console.log("??");
+});
+
+onAuthStateChanged(auth, (user) => {
+  console.log(user, "user change!!");
+  if (!user) {
+    logoutBtn.textContent = "login";
+  }
+});
+
+const google = document.querySelector(".google");
+
+google.addEventListener("click", async (e) => {
+
+  const googleProvider = new GoogleAuthProvider()  
+  try {
+    const googleLogin = await signInWithPopup(auth,googleProvider);
+    console.log(googleLogin,"google login")
+  } catch {
+    console.log("ERROR@@@")
+  }
+});
