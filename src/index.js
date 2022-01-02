@@ -15,8 +15,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { createUserWithEmailAndPassword, getAuth} from "firebase/auth";
-import { async } from "@firebase/util";
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB2qgRYtp7RhPX24cPp4mH4LarOGm_2J2k",
@@ -56,7 +55,8 @@ const addForm = document.querySelector(".add");
 const deleteForm = document.querySelector(".delete");
 const editForm = document.querySelector(".edit");
 const box = document.querySelector(".box");
-const loginForm = document.querySelector(".signup");
+const signForm = document.querySelector(".signup");
+const loginForm = document.querySelector(".login");
 // on snap shot!@
 
 
@@ -128,15 +128,34 @@ editForm.addEventListener("submit",async (e)=>{
 
 
 // getAuth
-loginForm.addEventListener("submit",async(e)=>{
+signForm.addEventListener("submit",async(e)=>{
     e.preventDefault();
 
-    const email = loginForm.email.value;
-    const password = loginForm.password.value;
+    const email = signForm.email.value;
+    const password = signForm.password.value;
 
     const pureLogin = await createUserWithEmailAndPassword(auth,email,password);
     console.log(pureLogin,"login");
+});
 
+loginForm.addEventListener("submit",async(e)=>{
+  e.preventDefault();
+
+  const email = loginForm.email.value;
+  const password = loginForm.password.value;
+
+  try{
+    const user = await signInWithEmailAndPassword(auth,email,password);
+    console.log(user.user,"??suer ")
+  }catch(error){
+    console.log(error,"login fail")
+  }
 })
 
 
+const logoutBtn = document.querySelector(".logout");
+
+logoutBtn.addEventListener("click",async()=>{
+    await signOut(auth);
+    console.log("??")
+})
